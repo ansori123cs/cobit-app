@@ -1,43 +1,30 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/context/AuthContext';
 
-const Navbar = () => {
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-  }, []);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    location.href = '/';
-  };
+export default function Navbar() {
+  const { user, signOut } = useAuth();
 
   return (
-    <nav className='flex justify-between bg-white p-4 shadow mb-4 rounded'>
-      <Link href='/' className='font-bold text-2xl'>
+    <nav className='flex justify-between p-4 bg-white shadow'>
+      <Link href='/' className='font-bold'>
         COBIT App
       </Link>
-
-      <div className='nav-items'></div>
       <div className='space-x-4'>
         {!user ? (
-          <>
-            <Link href='/login'>Login</Link>
-            <Link href='/register'>Register</Link>
-          </>
+          <div className='flex gap-2'>
+            <Link href='/sign-in'>Masuk</Link>
+            <Link href='/sign-up'>Daftar</Link>
+          </div>
         ) : (
-          <>
-            <Link href='/dashboard'>Dashboard</Link>
-            <button onClick={handleLogout} className='text-red-500'>
+          <div className='flex items-center gap-2'>
+            <span className='hover:text-gray-300'>{user.name ?? user.email}</span>
+            <button className='ml-2 hover:underline hover:text-gray-300' onClick={() => signOut()}>
               Logout
             </button>
-          </>
+          </div>
         )}
       </div>
     </nav>
   );
-};
-export default Navbar;
+}

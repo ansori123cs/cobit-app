@@ -2,6 +2,7 @@
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import Loader from '@/component/Loader';
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
@@ -34,7 +35,7 @@ export default function CapabilityChart() {
     load();
   }, []);
 
-  if (loading) return <div>Loading chart...</div>;
+  if (loading) return <Loader />;
   if (!rows.length) return <div>Tidak ada data capability.</div>;
 
   const categories = rows.map((r) => r.subprocess_code);

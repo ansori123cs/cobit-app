@@ -2,13 +2,20 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import CapabilityChart from '@/component/CapabilityChart';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import Loader from '@/component/Loader';
 
-export default function Dashboard() {
-  const [user, setUser] = useState<any>(null);
+export default function DashboardPage() {
+  const { user, isLoading, isAuthenticated } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-  }, []);
+    if (!isLoading && !isAuthenticated) router.push('/sign-in');
+  }, [isLoading, isAuthenticated, router]);
+
+  if (isLoading) return <Loader />;
+  if (!isAuthenticated) return null;
 
   return (
     <div>

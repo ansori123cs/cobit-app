@@ -83,9 +83,7 @@ export default function Kuesioner() {
   // ✅ cek apakah semua pertanyaan di domain sudah terjawab
   const isDomainComplete = (qs: Question[]) => qs.every((q) => answers[q.id] !== undefined && answers[q.id] !== null);
 
-  if (loading) {
-    return <p className='text-center text-gray-500'>Memuat pertanyaan...</p>;
-  }
+  if (loading) return <Loader />;
 
   return (
     <form onSubmit={handleSubmit} className='space-y-4'>
