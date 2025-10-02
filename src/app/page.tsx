@@ -1,14 +1,15 @@
 'use client';
 import Link from 'next/link';
 import Avatar from '@/component/Avatar';
+import Typewriter from '@/component/TypewriterEffect';
 
 export default function Home() {
   return (
     <div className='w-full min-h-screen px-6 text-gray-800'>
-      <h1 className='text-3xl font-extrabold mb-4'>
-        Selamat Datang di <span className='text-blue-600'>COBIT App</span>
-      </h1>
-
+      <div className='flex items-center justify-start  bg-white shadow rounded-lg p-6 mb-6'>
+        <Typewriter text='Selamat Datang Di ' delay={250} className='text-3xl font-bold' />
+        <Typewriter text='Cobit App' delay={250} className='text-3xl font-bold text-xl-blue ms-3' />
+      </div>
       {/* Profil Mahasiswa */}
       <div className='flex items-center justify-between  bg-white shadow rounded-lg p-6 mb-6'>
         {/* Info Text */}
@@ -20,17 +21,20 @@ export default function Home() {
             <p className='text-gray-500 text-sm mt-2'>Mahasiswa Sistem Informasi – ITATS</p>
           </div>
           {/* Foto Profil */}
-          <Avatar
-            id='pic'
-            alt='muhammad satria aulia'
-            width={96} // ✅ 96px (setara w-24 di Tailwind)
-            height={96} // ✅ 96px
-            className='mt-3'
-          />
+          <div className='rounded-full overflow-hidden shadow-md'>
+            <Avatar
+              id='pic'
+              alt='muhammad satria aulia'
+              width={96} // ✅ 96px (setara w-24 di Tailwind)
+              height={96} // ✅ 96px
+              className='mt-3'
+            />
+          </div>
         </div>
         {/* Link ke Dashboard */}
+
         <Link href='/dashboard' className='bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition'>
-          Masuk ke Dashboard
+          Mulai App Sekarang
         </Link>
       </div>
 

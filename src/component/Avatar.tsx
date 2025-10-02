@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 type AvatarProps = {
   id: string;
   alt: string;
@@ -8,10 +10,9 @@ type AvatarProps = {
 
 const Avatar = ({ id, alt, width = 64, height = 64, className = '' }: AvatarProps) => {
   return (
-    <div style={{ width: `${width}px`, height: `${height}px` }} className={`rounded-full ${className}`}>
-      <img src={`/avatars/${id}.png`} alt={alt} className='w-full h-full  rounded-full object-cover' />
+    <div className={`rounded-full overflow-hidden ${className}`} style={{ width, height }}>
+      <Image src={`/avatars/${id}.png`} alt={alt} width={width} height={height} className='object-cover w-full h-full' />
     </div>
   );
 };
-
 export default Avatar;
