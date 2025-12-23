@@ -1,17 +1,7 @@
 "use client";
 import { supabase } from "@/lib/supabaseClient";
 import { useState, useEffect } from "react";
-import { Risk } from "@/types/auth";
-
-interface CobitMap {
-  id: string;
-  domain: string;
-  process: string;
-  risk: {
-    area_control: string;
-    risk_description: string;
-  };
-}
+import { Risk, CobitMap } from "@/types/auth";
 
 export default function CobitMapping() {
   const [selectedRiskId, setSelectedRiskId] = useState("");
@@ -22,7 +12,7 @@ export default function CobitMapping() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [risks, setRisks] = useState<Risk[]>([]);
-  const [data, setData] = useState<CobitMap[]>([]);
+  const [cobbitMap, setCobbitMap] = useState<CobitMap[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
@@ -61,7 +51,7 @@ export default function CobitMapping() {
         )
       `);
       if (error) throw error;
-      setData(data || []);
+      setCobbitMap(data || []);
     } catch (err: any | Error) {
       setError("Gagal memuat data mapping.");
     } finally {
@@ -136,21 +126,17 @@ export default function CobitMapping() {
               </tr>
             </thead>
             <tbody>
-              {data.length === 0 ? (
+              {cobbitMap.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="p-3 text-center text-gray-500">
                     Belum ada data mapping COBIT.
                   </td>
                 </tr>
               ) : (
-                data.map((row) => (
+                cobbitMap.map((row) => (
                   <tr key={row.id} className="hover:bg-gray-50">
-                    <td className="p-3 border border-gray-300">
-                      {row.risk.area_control}
-                    </td>
-                    <td className="p-3 border border-gray-300">
-                      {row.risk.risk_description}
-                    </td>
+                    {/* <td className="p-3 border border-gray-300">{row.risk}</td>
+                    <td className="p-3 border border-gray-300">{row.risk}</td> */}
                     <td className="p-3 border border-gray-300 font-semibold">
                       {row.domain}
                     </td>

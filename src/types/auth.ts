@@ -30,3 +30,13 @@ export interface Risk {
   area_control: string;
   risk_description: string;
 }
+
+export interface CobitMap {
+  id: string;
+  domain: string;
+  process: string;
+  risk: {
+    area_control: string;
+    risk_description: string;
+  }[];
+}
