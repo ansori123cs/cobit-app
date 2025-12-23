@@ -1,16 +1,29 @@
-'use client';
+"use client";
 
-import { AuthProvider } from '@/context/AuthContext';
-import Navbar from '@/component/Navbar';
-import './globals.css';
+import { AuthProvider } from "@/context/AuthContext";
+import Navbar from "@/component/Navbar";
+import Footer from "@/component/Footer";
+import "./globals.css";
+import { useEffect } from "react";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  useEffect(() => {
+    document.title = "COBIT App";
+  }, []);
+
   return (
-    <html lang='en'>
-      <body className='min-h-screen bg-gray-50 text-gray-800'>
+    <html lang="id">
+      <body className="min-h-screen bg-gray-50 text-gray-800 flex flex-col">
         <AuthProvider>
           <Navbar />
-          <main className='mx-auto p-4'>{children}</main>
+          <main className="flex-grow mx-auto p-4 w-full max-w-7xl">
+            {children}
+          </main>
+          <Footer />
         </AuthProvider>
       </body>
     </html>
