@@ -24,3 +24,9 @@ export type AuthContextType = AuthState & {
 
 export type AuthResponse = any;
 export type OAuthResponse = any;
+
+export interface Risk {
+  id: string;
+  area_control: string;
+  risk_description: string;
+}

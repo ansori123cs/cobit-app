@@ -128,9 +128,7 @@ export default function DashboardPage() {
             <Card title="Ekstrem" value={summary.ekstrem} />
           </div>
         )}
-        <div className="mb-8">
-          <CapabilityChart />
-        </div>
+        <div className="mb-8">{/* <CapabilityChart /> */}</div>
         <div className="bg-white p-4 rounded shadow">
           <h2 className="text-xl font-bold mb-4">Navigasi Cepat</h2>
           <ul className="space-y-2">

@@ -1,19 +1,41 @@
 "use client";
 import { supabase } from "@/lib/supabaseClient";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Risk } from "@/types/auth";
 
 export default function RecommendationPage() {
-  const [riskId, setRiskId] = useState("");
+  const [selectedRiskId, setSelectedRiskId] = useState("");
   const [rec, setRec] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [risks, setRisks] = useState<Risk[]>([]);
+
+  useEffect(() => {
+    const fetchRisks = async () => {
+      setFetchLoading(true);
+      setError("");
+      try {
+        const { data, error } = await supabase
+          .from("risk_register")
+          .select("id, area_control, risk_description");
+        if (error) throw error;
+        setRisks(data || []);
+      } catch (err: any | Error) {
+        setError("Gagal memuat data risiko.");
+      } finally {
+        setFetchLoading(false);
+      }
+    };
+    fetchRisks();
+  }, []);
 
   const saveRec = async () => {
     setError("");
     setSuccess("");
-    if (!riskId.trim() || !rec.trim()) {
-      setError("Risk ID dan Rekomendasi harus diisi.");
+    if (!selectedRiskId || !rec.trim()) {
+      setError("Risiko dan Rekomendasi harus diisi.");
       return;
     }
     setLoading(true);
@@ -21,14 +43,14 @@ export default function RecommendationPage() {
       const { error: insertError } = await supabase
         .from("governance_recommendations")
         .insert({
-          risk_id: riskId,
+          risk_id: selectedRiskId,
           recommendation: rec,
         });
       if (insertError) throw insertError;
       setSuccess("Rekomendasi berhasil disimpan!");
-      setRiskId("");
+      setSelectedRiskId("");
       setRec("");
-    } catch (err: any) {
+    } catch (err: any | Error) {
       setError(err.message || "Gagal menyimpan. Silakan coba lagi.");
     } finally {
       setLoading(false);
@@ -45,15 +67,24 @@ export default function RecommendationPage() {
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Risk ID
+            Pilih Risiko
           </label>
-          <input
-            type="text"
+          <select
+            value={selectedRiskId}
+            onChange={(e) => setSelectedRiskId(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Risk ID"
-            value={riskId}
-            onChange={(e) => setRiskId(e.target.value)}
-          />
+            disabled={loading || fetchLoading}
+          >
+            <option value="">-- Pilih Risiko --</option>
+            {risks.map((risk) => (
+              <option key={risk.id} value={risk.id}>
+                {risk.area_control}: {risk.risk_description}
+              </option>
+            ))}
+          </select>
+          {fetchLoading && (
+            <p className="text-sm text-gray-500 mt-1">Memuat data risiko...</p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -65,6 +96,7 @@ export default function RecommendationPage() {
             value={rec}
             onChange={(e) => setRec(e.target.value)}
             rows={4}
+            disabled={loading}
           />
         </div>
         <button
