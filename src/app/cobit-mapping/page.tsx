@@ -161,7 +161,7 @@ export default function CobitMapping() {
             <select
               value={selectedRiskId}
               onChange={(e) => setSelectedRiskId(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
               disabled={loading || fetchLoading}
             >
               <option value="">-- Pilih Risiko --</option>
@@ -184,7 +184,7 @@ export default function CobitMapping() {
             <select
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
               disabled={loading}
             >
               <option value="">-- Pilih Domain --</option>
@@ -201,7 +201,7 @@ export default function CobitMapping() {
             </label>
             <input
               type="text"
-              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
               placeholder="Contoh: DSS01, APO01"
               value={process}
               onChange={(e) => setProcess(e.target.value)}
@@ -211,7 +211,7 @@ export default function CobitMapping() {
           <button
             onClick={saveMapping}
             disabled={loading}
-            className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition disabled:bg-gray-400"
+            className="w-full py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
           >
             {loading ? "Menyimpan..." : "Simpan"}
           </button>

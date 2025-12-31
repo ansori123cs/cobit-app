@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Loader from "@/component/Loader";
 import Link from "next/link";
+import { testOpenAi } from "@/lib/openAiClient";
+import DashboardChart from "@/component/DashboardChart";
 
 const menus = [
   { title: "Dashboard", href: "/dashboard" },
@@ -33,6 +35,8 @@ const menus = [
   { title: "Monitoring & Evaluasi", href: "/monitoring" },
 ];
 
+const seriesLevel = ["Rendah", "Sedang", "Tinggi", "Ekstrem"];
+
 export default function DashboardPage() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -48,10 +52,18 @@ export default function DashboardPage() {
     tinggi: 0,
     ekstrem: 0,
   });
+
+  type Series = {
+    name: string;
+    data: number[];
+  };
+
+  const [series, setSeries] = useState<Series[]>([]);
   const [loadingSummary, setLoadingSummary] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // testOpenAi("apakah next js masih aman?");
     const load = async () => {
       setLoadingSummary(true);
       setError("");
@@ -68,6 +80,17 @@ export default function DashboardPage() {
           ekstrem: data?.filter((d) => d.risk_level === "Ekstrem").length || 0,
         };
         setSummary(result);
+        setSeries([
+          {
+            name: "Data Resiko",
+            data: [
+              data?.filter((d) => d.risk_level === "Rendah").length || 0,
+              data?.filter((d) => d.risk_level === "Sedang").length || 0,
+              data?.filter((d) => d.risk_level === "Tinggi").length || 0,
+              data?.filter((d) => d.risk_level === "Ekstrem").length || 0,
+            ],
+          },
+        ]);
       } catch (err: any) {
         setError(err.message || "Gagal memuat ringkasan risiko.");
       } finally {
@@ -128,7 +151,9 @@ export default function DashboardPage() {
             <Card title="Ekstrem" value={summary.ekstrem} />
           </div>
         )}
-        <div className="mb-8">{/* <CapabilityChart /> */}</div>
+        <div className="mb-8">
+          <DashboardChart series={series} categories={seriesLevel} />
+        </div>
         <div className="bg-white p-4 rounded shadow">
           <h2 className="text-xl font-bold mb-4">Navigasi Cepat</h2>
           <ul className="space-y-2">

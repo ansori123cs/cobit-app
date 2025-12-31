@@ -4,6 +4,12 @@ import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Risk } from "@/types/auth";
 
+import {
+  SweetAlertErrorDialogue,
+  SweetAlertSuccessDialogue,
+} from "@/component/SwalFire";
+import { useRouter } from "next/navigation";
+
 export default function AssessmentPage() {
   const { id } = useParams();
   const [impact, setImpact] = useState(1);
@@ -14,6 +20,8 @@ export default function AssessmentPage() {
   const [success, setSuccess] = useState("");
   const [risks, setRisks] = useState<Risk[]>([]);
   const [selectedRiskId, setSelectedRiskId] = useState(id || "");
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchRisks = async () => {
@@ -52,8 +60,14 @@ export default function AssessmentPage() {
         });
       if (insertError) throw insertError;
       setSuccess("Penilaian risiko berhasil disimpan!");
+      SweetAlertSuccessDialogue("Penilaian risiko berhasil disimpan!");
+
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 800);
     } catch (err: any | Error) {
       setError(err.message || "Gagal menyimpan penilaian.");
+      SweetAlertErrorDialogue("Gagal menyimpan penilaian");
     } finally {
       setLoading(false);
     }
@@ -68,7 +82,7 @@ export default function AssessmentPage() {
       {success && <p className="text-green-500 mb-4">{success}</p>}
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-base font-medium text-gray-700 mb-1">
             Pilih Risiko
           </label>
           <select
@@ -89,31 +103,65 @@ export default function AssessmentPage() {
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Impact (1-5)
+          <label className="block text-base font-medium text-gray-700 mb-1">
+            Impact
           </label>
-          <input
-            type="number"
-            min={1}
-            max={5}
-            value={impact}
-            onChange={(e) => setImpact(+e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
+
+          <div className="flex items-center justify-center gap-10">
+            <p className="block text-sm font-medium text-gray-700 mb-1">
+              Rendah
+            </p>
+            {[1, 2, 3, 4, 5].map((value) => (
+              <div key={value} className="flex-row items-center justify-center">
+                <input
+                  type="radio"
+                  name="impact"
+                  value={value}
+                  checked={impact === value}
+                  onChange={(e) => setImpact(Number(e.target.value))}
+                  className="accent-blue-600"
+                />
+                <p className="block text-sm font-medium text-gray-700 mb-1">
+                  {value}
+                </p>
+              </div>
+            ))}
+            <p className="block text-sm font-medium text-gray-700 mb-1">
+              Tinggi
+            </p>
+          </div>
         </div>
+
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Likelihood (1-5)
+          <label className="block text-base font-medium text-gray-700 mb-1">
+            Likelihood
           </label>
-          <input
-            type="number"
-            min={1}
-            max={5}
-            value={likelihood}
-            onChange={(e) => setLikelihood(+e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
+
+          <div className="flex items-center justify-center gap-10">
+            <p className="block text-sm font-medium text-gray-700 mb-1">
+              Rendah
+            </p>
+            {[1, 2, 3, 4, 5].map((value) => (
+              <div key={value} className="flex-row items-center justify-center">
+                <input
+                  type="radio"
+                  name="likelihood"
+                  value={value}
+                  checked={likelihood === value}
+                  onChange={(e) => setLikelihood(Number(e.target.value))}
+                  className="accent-blue-600"
+                />
+                <p className="block text-sm font-medium text-gray-700 mb-1">
+                  {value}
+                </p>
+              </div>
+            ))}
+            <p className="block text-sm font-medium text-gray-700 mb-1">
+              Tinggi
+            </p>
+          </div>
         </div>
+
         <button
           onClick={assess}
           disabled={loading}
