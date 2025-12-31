@@ -38,14 +38,19 @@ export default function RiskPage() {
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-4">Identifikasi Risiko TI</h1>
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      <input
-        type="text"
-        placeholder="Area Kontrol"
+      <select
         value={area}
         onChange={(e) => setArea(e.target.value)}
         className="w-full p-2 mb-4 border border-gray-300 rounded"
         disabled={loading}
-      />
+      >
+        <option value="">Pilih Area Kontrol</option>
+        <option value="Access Control">Access Control</option>
+        <option value="Backup Management">Backup Management</option>
+        <option value="Change Management">Change Management</option>
+        <option value="Incident Management">Incident Management</option>
+        <option value="Other">Other</option>
+      </select>
       <textarea
         placeholder="Deskripsi Risiko"
         value={desc}

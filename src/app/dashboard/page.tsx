@@ -35,7 +35,8 @@ const menus = [
   { title: "Monitoring & Evaluasi", href: "/monitoring" },
 ];
 
-const seriesLevel = ["Rendah", "Sedang", "Tinggi", "Ekstrem"];
+const seriesResikoLevel = ["Rendah", "Sedang", "Tinggi", "Ekstrem"];
+const seriesMonitoringLevel = ["Belum", "Proses", "Selesai"];
 
 export default function DashboardPage() {
   const { user, isLoading, isAuthenticated } = useAuth();
@@ -53,12 +54,20 @@ export default function DashboardPage() {
     ekstrem: 0,
   });
 
+  const [summaryMonitoring, setSummaryMonitoring] = useState({
+    total: 0,
+    belum: 0,
+    proses: 0,
+    selesai: 0,
+  });
+
   type Series = {
     name: string;
     data: number[];
   };
 
-  const [series, setSeries] = useState<Series[]>([]);
+  const [series1, setSeries1] = useState<Series[]>([]);
+  const [series2, setSeries2] = useState<Series[]>([]);
   const [loadingSummary, setLoadingSummary] = useState(true);
   const [error, setError] = useState("");
 
@@ -80,7 +89,7 @@ export default function DashboardPage() {
           ekstrem: data?.filter((d) => d.risk_level === "Ekstrem").length || 0,
         };
         setSummary(result);
-        setSeries([
+        setSeries1([
           {
             name: "Data Resiko",
             data: [
@@ -97,65 +106,144 @@ export default function DashboardPage() {
         setLoadingSummary(false);
       }
     };
-    if (isAuthenticated) load();
+    const load2 = async () => {
+      setLoadingSummary(true);
+      setError("");
+      try {
+        const { data, error: fetchError } = await supabase
+          .from("monitoring_evaluation")
+          .select("status");
+        if (fetchError) throw fetchError;
+        const result = {
+          total: data?.length || 0,
+          belum: data?.filter((d) => d.status === "Belum").length || 0,
+          proses: data?.filter((d) => d.status === "Proses").length || 0,
+          selesai: data?.filter((d) => d.status === "Selesai").length || 0,
+        };
+        setSummaryMonitoring(result);
+        setSeries2([
+          {
+            name: "Data Monitoring",
+            data: [
+              data?.filter((d) => d.status === "Belum").length || 0,
+              data?.filter((d) => d.status === "Proses").length || 0,
+              data?.filter((d) => d.status === "Selesai").length || 0,
+            ],
+          },
+        ]);
+      } catch (err: any) {
+        setError(err.message || "Gagal memuat ringkasan monitoring.");
+      } finally {
+        setLoadingSummary(false);
+      }
+    };
+    if (isAuthenticated) {
+      load();
+      load2();
+    }
   }, [isAuthenticated]);
 
   if (isLoading) return <Loader />;
   if (!isAuthenticated) return null;
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex flex-row bg-gray-50">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900 text-white p-4">
-        <h2 className="text-xl font-bold mb-6">Audit TI COBIT 2019</h2>
-        {menus.map((menu, i) => (
-          <div key={i} className="mb-3">
-            <p className="font-semibold">{menu.title}</p>
-            {menu.children && (
-              <ul className="ml-4 mt-2 space-y-1 text-sm">
-                {menu.children.map((child, j) => (
-                  <li key={j}>
-                    <Link href={child.href} className="hover:underline">
-                      {child.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {!menu.children && (
-              <Link
-                href={menu.href!}
-                className="block mt-1 text-sm hover:underline"
-              >
-                Buka
-              </Link>
-            )}
-          </div>
-        ))}
+      <div className="flex flex-col w-1/6 bg-blue-500 text-white  gap-y-2 rounded-xl mx-2 mt-3 ">
+        <div className="py-3 ">
+          {menus.map((menu, i) => (
+            <div key={i} className="flex flex-col ">
+              <p className="font-semibold px-2 text-lg">{menu.title}</p>
+              {menu.children && (
+                <div className="flex flex-col w-full space-y-1 text-sm  my-3">
+                  {menu.children.map((child, j) => (
+                    <div key={j} className="w-full hover:bg-blue-800 py-2 px-4">
+                      <Link href={child.href} className="text-base">
+                        {child.title}
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {!menu.children && (
+                <Link
+                  href={menu.href!}
+                  className="block mt-1 text-base w-full hover:bg-blue-800 py-2 px-4"
+                >
+                  Buka
+                </Link>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-3">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">
           Dashboard Audit Risiko TI
         </h1>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        {loadingSummary ? (
-          <Loader />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-            <Card title="Total Risiko" value={summary.total} />
-            <Card title="Rendah" value={summary.rendah} />
-            <Card title="Sedang" value={summary.sedang} />
-            <Card title="Tinggi" value={summary.tinggi} />
-            <Card title="Ekstrem" value={summary.ekstrem} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          {/* Chart Risiko */}
+          <div className="bg-white p-4 rounded shadow flex flex-col">
+            <h2 className="text-2xl font-bold mb-4">Chart Risiko</h2>
+
+            {error && <p className="text-red-500 mb-4">{error}</p>}
+
+            {loadingSummary ? (
+              <Loader />
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 my-3">
+                <Card title="Total Risiko" value={summary.total} />
+                <Card title="Rendah" value={summary.rendah} />
+                <Card title="Sedang" value={summary.sedang} />
+                <Card title="Tinggi" value={summary.tinggi} />
+                <Card title="Ekstrem" value={summary.ekstrem} />
+              </div>
+            )}
+
+            {/* Chart dipaksa mengisi ruang */}
+            <div className="flex-1">
+              <DashboardChart series={series1} categories={seriesResikoLevel} />
+            </div>
           </div>
-        )}
-        <div className="mb-8">
-          <DashboardChart series={series} categories={seriesLevel} />
+
+          {/* Chart Monitoring */}
+          <div className="bg-white p-4 rounded shadow flex flex-col">
+            <h2 className="text-2xl font-bold mb-4">Chart Monitoring</h2>
+
+            {error && <p className="text-red-500 mb-4">{error}</p>}
+
+            {loadingSummary ? (
+              <Loader />
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-3">
+                <Card
+                  title="Total Monitoring"
+                  value={summaryMonitoring.total}
+                />
+                <Card title="Belum" value={summaryMonitoring.belum} />
+                <Card title="Proses" value={summaryMonitoring.proses} />
+                <Card title="Selesai" value={summaryMonitoring.selesai} />
+              </div>
+            )}
+
+            <div className="flex-1">
+              <DashboardChart
+                series={series2}
+                categories={seriesMonitoringLevel}
+              />
+            </div>
+          </div>
         </div>
-        <div className="bg-white p-4 rounded shadow">
+      </div>
+      {/* <div className="bg-white p-4 rounded shadow">
           <h2 className="text-xl font-bold mb-4">Navigasi Cepat</h2>
+          {user && (
+            <p className="mt-4 text-base font-bold text-gray-700">
+              Halo, {user.name ?? user.email}
+            </p>
+          )}
           <ul className="space-y-2">
             <li>
               <Link href="/kuesioner" className="text-blue-500 hover:underline">
@@ -168,13 +256,7 @@ export default function DashboardPage() {
               </Link>
             </li>
           </ul>
-          {user && (
-            <p className="mt-4 text-gray-700">
-              Halo, {user.name ?? user.email}
-            </p>
-          )}
-        </div>
-      </div>
+        </div> */}
     </div>
   );
 }

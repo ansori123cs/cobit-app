@@ -9,8 +9,8 @@ export default function Navbar() {
 
   return (
     <nav className="flex justify-between p-4 bg-white shadow">
-      <Link href="/" className="font-bold">
-        COBIT App
+      <Link href="/" className="font-bold text-2xl">
+        Audit TI Cobit 2019
       </Link>
       <div className="space-x-4">
         {!user ? (
@@ -21,11 +21,11 @@ export default function Navbar() {
         ) : (
           <div className="flex items-center gap-2">
             <span className="hover:text-gray-300">
-              {user.name ?? user.email}
+              Halo {user.name ?? user.email}
             </span>
             <button
-              className="ml-2 hover:underline hover:text-gray-300"
-              onClick={() => signOut()}
+              onClick={signOut}
+              className="ml-2 p-3 rounded-full transition duration-200 hover:underline"
             >
               Logout
             </button>
