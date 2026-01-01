@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import Select from "react-select";
+import { useRouter } from "next/navigation";
 
 type Recommendation = {
   id: string;
@@ -75,9 +77,12 @@ export default function MonitoringPage() {
       setLoading(false);
     }
   };
-
+  const router = useRouter();
+  const handleBack = () => {
+    router.back();
+  };
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen">
+    <div className="flex-1 p-6 bg-white m-3 rounded shadow">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">
         Monitoring & Evaluasi Rekomendasi TI
       </h1>
@@ -130,16 +135,22 @@ export default function MonitoringPage() {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Status
           </label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            disabled={loading}
-          >
-            <option value="Belum">Belum</option>
-            <option value="Proses">Proses</option>
-            <option value="Selesai">Selesai</option>
-          </select>
+          <Select
+            value={status ? { value: status, label: status } : null}
+            onChange={(selectedOption) =>
+              setStatus(selectedOption ? selectedOption.value : "")
+            }
+            options={[
+              { value: "Belum", label: "Belum" },
+              { value: "Proses", label: "Proses" },
+              { value: "Selesai", label: "Selesai" },
+            ]}
+            isSearchable={true}
+            isClearable={true}
+            placeholder="Pilih Status"
+            className="w-full"
+            isDisabled={loading}
+          />
         </div>
 
         <div className="mb-4">
@@ -154,14 +165,23 @@ export default function MonitoringPage() {
             disabled={loading}
           />
         </div>
+        <div className="flex flex-row gap-3 justify-end">
+          <button
+            onClick={handleBack}
+            disabled={loading}
+            className="w-1/4 bg-red-500 text-white p-2 rounded hover:bg-red-600 disabled:bg-gray-400"
+          >
+            {loading ? "Kembali..." : "Kembali"}
+          </button>
 
-        <button
-          onClick={saveMonitoring}
-          disabled={loading}
-          className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition disabled:bg-gray-400"
-        >
-          {loading ? "Menyimpan..." : "Simpan Evaluasi"}
-        </button>
+          <button
+            onClick={saveMonitoring}
+            disabled={loading}
+            className="w-1/4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition disabled:bg-gray-400"
+          >
+            {loading ? "Menyimpan..." : "Simpan Evaluasi"}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -9,6 +9,7 @@ import {
   SweetAlertSuccessDialogue,
 } from "@/component/SwalFire";
 import { useRouter } from "next/navigation";
+import Select from "react-select";
 
 export default function AssessmentPage() {
   const { id } = useParams();
@@ -19,7 +20,7 @@ export default function AssessmentPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [risks, setRisks] = useState<Risk[]>([]);
-  const [selectedRiskId, setSelectedRiskId] = useState(id || "");
+  const [selectedRiskId, setSelectedRiskId] = useState("Silahkan Pilih");
 
   const router = useRouter();
 
@@ -72,9 +73,12 @@ export default function AssessmentPage() {
       setLoading(false);
     }
   };
+  const handleBack = () => {
+    router.back();
+  };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="flex-1 p-6 bg-white m-3 rounded shadow ">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
         Penilaian Risiko
       </h1>
@@ -85,19 +89,33 @@ export default function AssessmentPage() {
           <label className="block text-base font-medium text-gray-700 mb-1">
             Pilih Risiko
           </label>
-          <select
-            value={selectedRiskId}
-            onChange={(e) => setSelectedRiskId(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            disabled={loading || fetchLoading}
-          >
-            <option value="">-- Pilih Risiko --</option>
-            {risks.map((risk) => (
-              <option key={risk.id} value={risk.id}>
-                {risk.area_control}: {risk.risk_description}
-              </option>
-            ))}
-          </select>
+
+          <Select
+            placeholder="-- Pilih Risiko --"
+            value={
+              selectedRiskId
+                ? {
+                    value: selectedRiskId,
+                    label:
+                      risks.find((r) => r.id === selectedRiskId)?.area_control +
+                      ": " +
+                      risks.find((r) => r.id === selectedRiskId)
+                        ?.risk_description,
+                  }
+                : null
+            }
+            onChange={(selectedOption) =>
+              setSelectedRiskId(selectedOption ? selectedOption.value : "")
+            }
+            options={risks.map((risk) => ({
+              value: risk.id,
+              label: `${risk.area_control}: ${risk.risk_description}`,
+            }))}
+            isSearchable={true}
+            isClearable={true}
+            className="w-full"
+            isDisabled={loading || fetchLoading}
+          />
           {fetchLoading && (
             <p className="text-sm text-gray-500 mt-1">Memuat data risiko...</p>
           )}
@@ -107,12 +125,12 @@ export default function AssessmentPage() {
             Impact
           </label>
 
-          <div className="flex items-center justify-center gap-10">
+          <div className="flex items-center justify-start gap-10 mt-2  p-2 mb-4 border border-gray-300 rounded h-24">
             <p className="block text-sm font-medium text-gray-700 mb-1">
               Rendah
             </p>
             {[1, 2, 3, 4, 5].map((value) => (
-              <div key={value} className="flex-row items-center justify-center">
+              <div key={value} className="mx-auto">
                 <input
                   type="radio"
                   name="impact"
@@ -137,12 +155,12 @@ export default function AssessmentPage() {
             Likelihood
           </label>
 
-          <div className="flex items-center justify-center gap-10">
+          <div className="flex items-center justify-start gap-10 mt-2  p-2 mb-4 border border-gray-300 rounded h-24">
             <p className="block text-sm font-medium text-gray-700 mb-1">
               Rendah
             </p>
             {[1, 2, 3, 4, 5].map((value) => (
-              <div key={value} className="flex-row items-center justify-center">
+              <div key={value} className="mx-auto">
                 <input
                   type="radio"
                   name="likelihood"
@@ -161,14 +179,23 @@ export default function AssessmentPage() {
             </p>
           </div>
         </div>
+        <div className="flex flex-row gap-3 justify-end">
+          <button
+            onClick={handleBack}
+            disabled={loading}
+            className="w-1/4 bg-red-500 text-white p-2 rounded hover:bg-red-600 disabled:bg-gray-400"
+          >
+            {loading ? "Kembali..." : "Kembali"}
+          </button>
 
-        <button
-          onClick={assess}
-          disabled={loading}
-          className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition disabled:bg-gray-400"
-        >
-          {loading ? "Menyimpan..." : "Hitung Risiko"}
-        </button>
+          <button
+            onClick={assess}
+            disabled={loading}
+            className="w-1/4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition disabled:bg-gray-400"
+          >
+            {loading ? "Menyimpan..." : "Hitung Risiko"}
+          </button>
+        </div>
       </div>
     </div>
   );

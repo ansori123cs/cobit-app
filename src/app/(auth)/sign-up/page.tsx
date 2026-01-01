@@ -51,10 +51,10 @@ export default function SignUpPage() {
   if (loading) return <Loader />;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="flex-1 tems-center justify-center bg-gray-50">
       <form
         onSubmit={onSubmit}
-        className="max-w-md w-full p-6 space-y-4 bg-white rounded-lg shadow-md"
+        className="flex flex-col  p-6 bg-white m-3 rounded shadow gap-y-2"
       >
         <h1 className="text-2xl font-bold text-center text-gray-800">Daftar</h1>
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}

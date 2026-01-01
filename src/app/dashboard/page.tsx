@@ -1,12 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import CapabilityChart from "@/component/CapabilityChart";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Loader from "@/component/Loader";
 import Link from "next/link";
-import { testOpenAi } from "@/lib/openAiClient";
 import DashboardChart from "@/component/DashboardChart";
 
 const menus = [

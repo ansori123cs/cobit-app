@@ -2,6 +2,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { useState, useEffect } from "react";
 import { Risk, CobitMap } from "@/types/auth";
+import Select from "react-select";
 
 export default function CobitMapping() {
   const [selectedRiskId, setSelectedRiskId] = useState("");
@@ -158,19 +159,33 @@ export default function CobitMapping() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Pilih Risiko
             </label>
-            <select
-              value={selectedRiskId}
-              onChange={(e) => setSelectedRiskId(e.target.value)}
-              className="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-              disabled={loading || fetchLoading}
-            >
-              <option value="">-- Pilih Risiko --</option>
-              {risks.map((risk) => (
-                <option key={risk.id} value={risk.id}>
-                  {risk.area_control}: {risk.risk_description}
-                </option>
-              ))}
-            </select>
+            <Select
+              value={
+                selectedRiskId
+                  ? {
+                      value: selectedRiskId,
+                      label:
+                        risks.find((r) => r.id === selectedRiskId)
+                          ?.area_control +
+                        ": " +
+                        risks.find((r) => r.id === selectedRiskId)
+                          ?.risk_description,
+                    }
+                  : null
+              }
+              onChange={(selectedOption) =>
+                setSelectedRiskId(selectedOption ? selectedOption.value : "")
+              }
+              options={risks.map((risk) => ({
+                value: risk.id,
+                label: `${risk.area_control}: ${risk.risk_description}`,
+              }))}
+              isSearchable={true}
+              isClearable={true}
+              placeholder="-- Pilih Risiko --"
+              className="w-full"
+              isDisabled={loading || fetchLoading}
+            />
             {fetchLoading && (
               <p className="text-sm text-gray-500 mt-1">
                 Memuat data risiko...
@@ -181,115 +196,190 @@ export default function CobitMapping() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Domain COBIT
             </label>
-            <select
-              value={domain}
-              onChange={(e) => setDomain(e.target.value)}
-              className="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-              disabled={loading}
-            >
-              <option value="">-- Pilih Domain --</option>
-              <option value="DSS">DSS (Deliver, Service and Support)</option>
-              <option value="APO">APO (Align, Plan and Organise)</option>
-              <option value="BAI">BAI (Build, Acquire and Implement)</option>
-              <option value="MEA">MEA (Monitor, Evaluate and Assess)</option>
-              <option value="EDM">EDM (Evaluate, Direct and Monitor)</option>
-            </select>
+            <Select
+              value={
+                domain
+                  ? {
+                      value: domain,
+                      label:
+                        domain === "DSS"
+                          ? "DSS (Deliver, Service and Support)"
+                          : domain === "APO"
+                          ? "APO (Align, Plan and Organise)"
+                          : domain === "BAI"
+                          ? "BAI (Build, Acquire and Implement)"
+                          : domain === "MEA"
+                          ? "MEA (Monitor, Evaluate and Assess)"
+                          : "EDM (Evaluate, Direct and Monitor)",
+                    }
+                  : null
+              }
+              onChange={(selectedOption) =>
+                setDomain(selectedOption ? selectedOption.value : "")
+              }
+              options={[
+                { value: "DSS", label: "DSS (Deliver, Service and Support)" },
+                { value: "APO", label: "APO (Align, Plan and Organise)" },
+                { value: "BAI", label: "BAI (Build, Acquire and Implement)" },
+                { value: "MEA", label: "MEA (Monitor, Evaluate and Assess)" },
+                { value: "EDM", label: "EDM (Evaluate, Direct and Monitor)" },
+              ]}
+              isSearchable={true}
+              isClearable={true}
+              placeholder="-- Pilih Domain --"
+              className="w-full"
+              isDisabled={loading}
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Proses COBIT
             </label>
-            <select
-              value={process}
-              onChange={(e) => setProcess(e.target.value)}
-              className="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
-              disabled={loading}
-            >
-              <option value="">-- Pilih Proses --</option>
-              <optgroup label="DSS (Deliver, Service and Support)">
-                <option value="DSS01">DSS01 - Manage Operations</option>
-                <option value="DSS02">
-                  DSS02 - Manage Service Requests and Incidents
-                </option>
-                <option value="DSS03">DSS03 - Manage Problems</option>
-                <option value="DSS04">DSS04 - Manage Continuity</option>
-                <option value="DSS05">DSS05 - Manage Security Services</option>
-                <option value="DSS06">
-                  DSS06 - Manage Business Process Controls
-                </option>
-              </optgroup>
-              <optgroup label="APO (Align, Plan and Organise)">
-                <option value="APO01">
-                  APO01 - Manage I&T Management Framework
-                </option>
-                <option value="APO02">APO02 - Manage Strategy</option>
-                <option value="APO03">
-                  APO03 - Manage Enterprise Architecture
-                </option>
-                <option value="APO04">APO04 - Manage Innovation</option>
-                <option value="APO05">APO05 - Manage Portfolio</option>
-                <option value="APO06">APO06 - Manage Budget and Costs</option>
-                <option value="APO07">APO07 - Manage Human Resources</option>
-                <option value="APO08">APO08 - Manage Relationships</option>
-                <option value="APO09">APO09 - Manage Service Agreements</option>
-                <option value="APO10">APO10 - Manage Suppliers</option>
-                <option value="APO11">APO11 - Manage Quality</option>
-                <option value="APO12">APO12 - Manage Risk</option>
-                <option value="APO13">APO13 - Manage Security</option>
-                <option value="APO14">APO14 - Manage Data</option>
-              </optgroup>
-              <optgroup label="BAI (Build, Acquire and Implement)">
-                <option value="BAI01">
-                  BAI01 - Manage Programmes and Projects
-                </option>
-                <option value="BAI02">
-                  BAI02 - Manage Requirements Definition
-                </option>
-                <option value="BAI03">
-                  BAI03 - Manage Solutions Identification and Build
-                </option>
-                <option value="BAI04">
-                  BAI04 - Manage Availability and Capacity
-                </option>
-                <option value="BAI05">
-                  BAI05 - Manage Organisational Change Enablement
-                </option>
-                <option value="BAI06">BAI06 - Manage Changes</option>
-                <option value="BAI07">
-                  BAI07 - Manage Change Acceptance and Transitioning
-                </option>
-                <option value="BAI08">BAI08 - Manage Knowledge</option>
-                <option value="BAI09">BAI09 - Manage Assets</option>
-                <option value="BAI10">BAI10 - Manage Configuration</option>
-              </optgroup>
-              <optgroup label="MEA (Monitor, Evaluate and Assess)">
-                <option value="MEA01">
-                  MEA01 - Monitor, Evaluate and Assess Performance and
-                  Conformance
-                </option>
-                <option value="MEA02">
-                  MEA02 - Monitor, Evaluate and Assess the System of Internal
-                  Controls
-                </option>
-                <option value="MEA03">
-                  MEA03 - Monitor, Evaluate and Assess Compliance with External
-                  Requirements
-                </option>
-              </optgroup>
-              <optgroup label="EDM (Evaluate, Direct and Monitor)">
-                <option value="EDM01">
-                  EDM01 - Ensure Governance Framework Setting and Maintenance
-                </option>
-                <option value="EDM02">EDM02 - Ensure Benefits Delivery</option>
-                <option value="EDM03">EDM03 - Ensure Risk Optimisation</option>
-                <option value="EDM04">
-                  EDM04 - Ensure Resource Optimisation
-                </option>
-                <option value="EDM05">
-                  EDM05 - Ensure Stakeholder Transparency
-                </option>
-              </optgroup>
-            </select>
+            <Select
+              value={process ? { value: process, label: process } : null}
+              onChange={(selectedOption) =>
+                setProcess(selectedOption ? selectedOption.value : "")
+              }
+              options={[
+                {
+                  label: "DSS (Deliver, Service and Support)",
+                  options: [
+                    { value: "DSS01", label: "DSS01 - Manage Operations" },
+                    {
+                      value: "DSS02",
+                      label: "DSS02 - Manage Service Requests and Incidents",
+                    },
+                    { value: "DSS03", label: "DSS03 - Manage Problems" },
+                    { value: "DSS04", label: "DSS04 - Manage Continuity" },
+                    {
+                      value: "DSS05",
+                      label: "DSS05 - Manage Security Services",
+                    },
+                    {
+                      value: "DSS06",
+                      label: "DSS06 - Manage Business Process Controls",
+                    },
+                  ],
+                },
+                {
+                  label: "APO (Align, Plan and Organise)",
+                  options: [
+                    {
+                      value: "APO01",
+                      label: "APO01 - Manage I&T Management Framework",
+                    },
+                    { value: "APO02", label: "APO02 - Manage Strategy" },
+                    {
+                      value: "APO03",
+                      label: "APO03 - Manage Enterprise Architecture",
+                    },
+                    { value: "APO04", label: "APO04 - Manage Innovation" },
+                    { value: "APO05", label: "APO05 - Manage Portfolio" },
+                    {
+                      value: "APO06",
+                      label: "APO06 - Manage Budget and Costs",
+                    },
+                    { value: "APO07", label: "APO07 - Manage Human Resources" },
+                    { value: "APO08", label: "APO08 - Manage Relationships" },
+                    {
+                      value: "APO09",
+                      label: "APO09 - Manage Service Agreements",
+                    },
+                    { value: "APO10", label: "APO10 - Manage Suppliers" },
+                    { value: "APO11", label: "APO11 - Manage Quality" },
+                    { value: "APO12", label: "APO12 - Manage Risk" },
+                    { value: "APO13", label: "APO13 - Manage Security" },
+                    { value: "APO14", label: "APO14 - Manage Data" },
+                  ],
+                },
+                {
+                  label: "BAI (Build, Acquire and Implement)",
+                  options: [
+                    {
+                      value: "BAI01",
+                      label: "BAI01 - Manage Programmes and Projects",
+                    },
+                    {
+                      value: "BAI02",
+                      label: "BAI02 - Manage Requirements Definition",
+                    },
+                    {
+                      value: "BAI03",
+                      label:
+                        "BAI03 - Manage Solutions Identification and Build",
+                    },
+                    {
+                      value: "BAI04",
+                      label: "BAI04 - Manage Availability and Capacity",
+                    },
+                    {
+                      value: "BAI05",
+                      label: "BAI05 - Manage Organisational Change Enablement",
+                    },
+                    { value: "BAI06", label: "BAI06 - Manage Changes" },
+                    {
+                      value: "BAI07",
+                      label:
+                        "BAI07 - Manage Change Acceptance and Transitioning",
+                    },
+                    { value: "BAI08", label: "BAI08 - Manage Knowledge" },
+                    { value: "BAI09", label: "BAI09 - Manage Assets" },
+                    { value: "BAI10", label: "BAI10 - Manage Configuration" },
+                  ],
+                },
+                {
+                  label: "MEA (Monitor, Evaluate and Assess)",
+                  options: [
+                    {
+                      value: "MEA01",
+                      label:
+                        "MEA01 - Monitor, Evaluate and Assess Performance and Conformance",
+                    },
+                    {
+                      value: "MEA02",
+                      label:
+                        "MEA02 - Monitor, Evaluate and Assess the System of Internal Controls",
+                    },
+                    {
+                      value: "MEA03",
+                      label:
+                        "MEA03 - Monitor, Evaluate and Assess Compliance with External Requirements",
+                    },
+                  ],
+                },
+                {
+                  label: "EDM (Evaluate, Direct and Monitor)",
+                  options: [
+                    {
+                      value: "EDM01",
+                      label:
+                        "EDM01 - Ensure Governance Framework Setting and Maintenance",
+                    },
+                    {
+                      value: "EDM02",
+                      label: "EDM02 - Ensure Benefits Delivery",
+                    },
+                    {
+                      value: "EDM03",
+                      label: "EDM03 - Ensure Risk Optimisation",
+                    },
+                    {
+                      value: "EDM04",
+                      label: "EDM04 - Ensure Resource Optimisation",
+                    },
+                    {
+                      value: "EDM05",
+                      label: "EDM05 - Ensure Stakeholder Transparency",
+                    },
+                  ],
+                },
+              ]}
+              isSearchable={true}
+              isClearable={true}
+              placeholder="-- Pilih Proses --"
+              className="w-full"
+              isDisabled={loading}
+            />
           </div>
           <button
             onClick={saveMapping}

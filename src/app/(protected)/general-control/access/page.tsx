@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 export default function AccessControlPage() {
   const [exist, setExist] = useState(false);
@@ -35,9 +36,12 @@ export default function AccessControlPage() {
       setLoading(false);
     }
   };
-
+  const router = useRouter();
+  const handleBack = () => {
+    router.back();
+  };
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="flex-1 p-6 bg-white m-3 rounded shadow">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
         General Control – Kontrol Akses
       </h1>
@@ -76,14 +80,23 @@ export default function AccessControlPage() {
             rows={4}
           />
         </div>
+        <div className="flex flex-row gap-3 justify-end">
+          <button
+            onClick={handleBack}
+            disabled={loading}
+            className="w-1/4 bg-red-500 text-white p-2 rounded hover:bg-red-600 disabled:bg-gray-400"
+          >
+            {loading ? "Kembali..." : "Kembali"}
+          </button>
 
-        <button
-          onClick={save}
-          disabled={loading}
-          className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition disabled:bg-gray-400"
-        >
-          {loading ? "Menyimpan..." : "Simpan"}
-        </button>
+          <button
+            onClick={save}
+            disabled={loading}
+            className="w-1/4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition disabled:bg-gray-400"
+          >
+            {loading ? "Menyimpan..." : "Simpan"}
+          </button>
+        </div>
       </div>
     </div>
   );
