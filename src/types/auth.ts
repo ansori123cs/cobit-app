@@ -38,5 +38,5 @@ export interface CobitMap {
   risk: {
     area_control: string;
     risk_description: string;
-  }[];
+  } | null;
 }

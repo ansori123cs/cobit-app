@@ -1,8 +1,9 @@
 "use client";
+
 import { supabase } from "@/lib/supabaseClient";
 import { useState, useEffect } from "react";
 import { Risk, CobitMap } from "@/types/auth";
-import Select from "react-select";
+import dynamic from "next/dynamic";
 
 export default function CobitMapping() {
   const [selectedRiskId, setSelectedRiskId] = useState("");
@@ -15,6 +16,13 @@ export default function CobitMapping() {
   const [risks, setRisks] = useState<Risk[]>([]);
   const [cobbitMap, setCobbitMap] = useState<CobitMap[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+
+  const Select = dynamic(() => import("react-select"), {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[38px] bg-gray-100 rounded animate-pulse"></div>
+    ),
+  });
 
   useEffect(() => {
     const fetchRisks = async () => {
@@ -46,13 +54,32 @@ export default function CobitMapping() {
         id,
         domain,
         process,
-        risk:risk_register!risk_id (
-          area_control,
-          risk_description
-        )
+        risk_id
       `);
+
       if (error) throw error;
-      setCobbitMap(data || []);
+
+      // Fetch risks separately atau gunakan RPC jika perlu
+      const riskIds = data.map((item) => item.risk_id).filter(Boolean);
+
+      if (riskIds.length > 0) {
+        const { data: risksData, error: risksError } = await supabase
+          .from("risk_register")
+          .select("id, area_control, risk_description")
+          .in("id", riskIds);
+
+        if (risksError) throw risksError;
+
+        // Gabungkan data
+        const combinedData = data.map((item) => ({
+          ...item,
+          risk: risksData?.find((r) => r.id === item.risk_id) || null,
+        }));
+
+        setCobbitMap(combinedData);
+      } else {
+        setCobbitMap(data.map((item) => ({ ...item, risk: null })));
+      }
     } catch (err: any | Error) {
       setError("Gagal memuat data mapping.");
     } finally {
@@ -136,8 +163,12 @@ export default function CobitMapping() {
               ) : (
                 cobbitMap.map((row) => (
                   <tr key={row.id} className="hover:bg-gray-50">
-                    {/* <td className="p-3 border border-gray-300">{row.risk}</td>
-                    <td className="p-3 border border-gray-300">{row.risk}</td> */}
+                    <td className="p-3 border border-gray-300">
+                      {row.risk?.area_control}
+                    </td>
+                    <td className="p-3 border border-gray-300">
+                      {row.risk?.risk_description}
+                    </td>
                     <td className="p-3 border border-gray-300 font-semibold">
                       {row.domain}
                     </td>
@@ -160,6 +191,7 @@ export default function CobitMapping() {
               Pilih Risiko
             </label>
             <Select
+              instanceId="risk-select"
               value={
                 selectedRiskId
                   ? {
@@ -205,12 +237,12 @@ export default function CobitMapping() {
                         domain === "DSS"
                           ? "DSS (Deliver, Service and Support)"
                           : domain === "APO"
-                          ? "APO (Align, Plan and Organise)"
-                          : domain === "BAI"
-                          ? "BAI (Build, Acquire and Implement)"
-                          : domain === "MEA"
-                          ? "MEA (Monitor, Evaluate and Assess)"
-                          : "EDM (Evaluate, Direct and Monitor)",
+                            ? "APO (Align, Plan and Organise)"
+                            : domain === "BAI"
+                              ? "BAI (Build, Acquire and Implement)"
+                              : domain === "MEA"
+                                ? "MEA (Monitor, Evaluate and Assess)"
+                                : "EDM (Evaluate, Direct and Monitor)",
                     }
                   : null
               }
@@ -236,6 +268,7 @@ export default function CobitMapping() {
               Proses COBIT
             </label>
             <Select
+              instanceId="domain-select"
               value={process ? { value: process, label: process } : null}
               onChange={(selectedOption) =>
                 setProcess(selectedOption ? selectedOption.value : "")
