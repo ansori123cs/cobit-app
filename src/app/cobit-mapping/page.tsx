@@ -4,6 +4,12 @@ import { supabase } from "@/lib/supabaseClient";
 import { useState, useEffect } from "react";
 import { Risk, CobitMap } from "@/types/auth";
 import dynamic from "next/dynamic";
+import { SingleValue } from "react-select";
+
+interface SelectOption {
+  value: string;
+  label: string;
+}
 
 export default function CobitMapping() {
   const [selectedRiskId, setSelectedRiskId] = useState("");
@@ -16,6 +22,8 @@ export default function CobitMapping() {
   const [risks, setRisks] = useState<Risk[]>([]);
   const [cobbitMap, setCobbitMap] = useState<CobitMap[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+
+ 
 
   const Select = dynamic(() => import("react-select"), {
     ssr: false,
@@ -205,7 +213,7 @@ export default function CobitMapping() {
                     }
                   : null
               }
-              onChange={(selectedOption) =>
+              onChange={(selectedOption: any) =>
                 setSelectedRiskId(selectedOption ? selectedOption.value : "")
               }
               options={risks.map((risk) => ({
@@ -246,7 +254,7 @@ export default function CobitMapping() {
                     }
                   : null
               }
-              onChange={(selectedOption) =>
+              onChange={(selectedOption: any) =>
                 setDomain(selectedOption ? selectedOption.value : "")
               }
               options={[
@@ -270,10 +278,10 @@ export default function CobitMapping() {
             <Select
               instanceId="domain-select"
               value={process ? { value: process, label: process } : null}
-              onChange={(selectedOption) =>
+              onChange={(selectedOption: any) =>
                 setProcess(selectedOption ? selectedOption.value : "")
               }
-              options={[
+              options={[    
                 {
                   label: "DSS (Deliver, Service and Support)",
                   options: [
