@@ -6,11 +6,6 @@ import { Risk, CobitMap } from "@/types/auth";
 import dynamic from "next/dynamic";
 import { SingleValue } from "react-select";
 
-interface SelectOption {
-  value: string;
-  label: string;
-}
-
 export default function CobitMapping() {
   const [selectedRiskId, setSelectedRiskId] = useState("");
   const [domain, setDomain] = useState("");
@@ -23,7 +18,10 @@ export default function CobitMapping() {
   const [cobbitMap, setCobbitMap] = useState<CobitMap[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
 
- 
+  interface SelectOption {
+    value: string;
+    label: string;
+  }
 
   const Select = dynamic(() => import("react-select"), {
     ssr: false,
@@ -281,7 +279,7 @@ export default function CobitMapping() {
               onChange={(selectedOption: any) =>
                 setProcess(selectedOption ? selectedOption.value : "")
               }
-              options={[    
+              options={[
                 {
                   label: "DSS (Deliver, Service and Support)",
                   options: [
